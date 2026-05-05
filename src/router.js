@@ -10,11 +10,13 @@ const router = createRouter({
     {
       //tela home
       path: '/',
+      name: 'Home',
       component: Home
     },
     {
       //tela de histórico
       path: '/history',
+      name: 'History',
       component: HistorySection
     }
   ]

@@ -1,6 +1,8 @@
 <script setup>
-import { computed, ref } from 'vue';
+import {computed, ref, watchEffect} from 'vue';
 import { useRouter } from 'vue-router';
+
+// TODO: Formulário deve calcular o valor pressionando Enter e não apenas no clique do botão
 
 //navegar para outras telas usando router.push().
 const router = useRouter();
@@ -12,7 +14,7 @@ createDataBase();
 const height = ref('');
 const weight = ref('');
 const name = ref('');
-const imc = ref('');
+const imc = ref(); // numero ou null (não for possível calcular) ou undefined (não calculado)
 
 //array do banco no local storage
 function createDataBase() {
@@ -54,57 +56,61 @@ function addOnDatabase(name, height, weight, imc) {
   return dataBaseOn;
 }
 
-//calc imc
-function FuncImc() {
+function calcularImc() {
   if (weight.value > 0 && height.value > 0) {
     const result = weight.value / (height.value * height.value);
-
-    if (result > 50 || result < 0) {
-      imc.value = 'Valor invalido';
-      return false;
-    } else {
-      imc.value = result.toFixed(2);
-      return true;
+    if (result > 0 && result < 50) {
+      return result;
     }
   }
-
-  imc.value = '';
-  return false;
+  return null;
 }
 
 //calcula o imc e adiciona se for valido
 function calcularEAdicionar() {
-  const imcValido = FuncImc();
+  imc.value = calcularImc();
 
-  if (imcValido) {
+  if (imc.value !== null) {
     addOnDatabase(name, height, weight, imc);
   }
 }
 
 // Navega para a tela de historico.
 function goToHistory() {
-  router.push('/history');
+  router.push({name: "History"});
 }
 
-//descrição dos valores do IMC
-const ImcDescription = computed(() => {
-  if (!imc.value) return '';
-  if (imc.value === 'Valor invalido') return '';
+const imcResult = computed(() => {
+  if (imc.value === null) return "Valor invalido";
+  if (imc.value === undefined) return "";
+  
+  return imc.value.toFixed(2);
+});
+
+const imcDescription = computed(() => {
+  if (imc.value === null || imc.value === undefined) return "";
+  
   if (imc.value < 18.5) return '⚠️ Abaixo do peso.';
   if (imc.value < 25) return '✅ Peso normal.';
   if (imc.value < 30) return '⚠️ Sobrepeso.';
-  if (imc.value > 30 && imc.value < 50) return '🚨 Obesidade.';
-  else "Dados Inválidos!"
+  if (imc.value < 50) return '🚨 Obesidade.';
+  
+  return "Dados Inválidos!";
 });
 
-const title = 'Calculadora IMC USR:';
+const disableCalcular = computed(() => {
+  if (height.value > 5) return true;
+  
+  return !name.value || !weight.value || !height.value;
+});
+
 </script>
 
 <template>
   <div class="MainContainer">
     <div class="layout">
       <div class="tittle">
-        <h2>{{ title }} {{ name }}</h2>
+        <h2>Calculadora IMC USR: {{ name }}</h2>
       </div>
 
       <div class="InputText">
@@ -125,13 +131,13 @@ const title = 'Calculadora IMC USR:';
       </div>
 
       <div class="Result">
-        <p class="ImcResult" v-if="imc">IMC: {{ imc }}</p>
-        <p class="ImcDescription" v-if="imc">Descricao: {{ ImcDescription }}</p>
+        <p class="ImcResult" v-if="imcResult">IMC: {{ imcResult }}</p>
+        <p class="ImcDescription" v-if="imcDescription">Descricao: {{ imcDescription }}</p>
       </div>
 
       <div class="BtnPlace">
         <!-- desabilita o campo se tiver algo vazio -->
-        <button @click="calcularEAdicionar" :disabled="!name || !weight || !height">
+        <button @click="calcularEAdicionar" :disabled="disableCalcular">
           Calcular
         </button>
         <button @click="goToHistory">
