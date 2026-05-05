@@ -21,13 +21,13 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
         <ul>
           <!-- li representa um item dentro da lista; aqui cada li mostra um usuario salvo. -->
           <li v-for="usr in history" :key="usr.name">
-            {{ usr.name }} - Altura: {{ usr.height }} - Peso: {{ usr.weight }} - IMC: {{ usr.imc }}
+            {{ usr.name }} - Altura: {{ usr.height }} m - Peso: {{ usr.weight }} kg - IMC: {{ usr.imc }}
           </li>
         </ul>
       </div>
 
       <div class="btnPlace">
-        <button class="btn" @click="router.push('/')">
+        <button class="btn" @click="router.push({name: 'Home'})">
           Voltar
         </button>
       </div>
