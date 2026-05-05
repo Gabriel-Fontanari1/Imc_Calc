@@ -2,15 +2,19 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+//navegar para outras telas usando router.push().
 const router = useRouter();
 
+//cria ou verifica se existe
 createDataBase();
 
+//estados ligados aos vmodels
 const height = ref('');
 const weight = ref('');
 const name = ref('');
 const imc = ref('');
 
+//array do banco no local storage
 function createDataBase() {
   const dataBaseExist = localStorage.getItem('dataBase');
 
@@ -24,6 +28,7 @@ function createDataBase() {
   }
 }
 
+//se ja tiver o usr ele só vai atualizar, caso contrario ele vai criar 1 novo
 function addOnDatabase(name, height, weight, imc) {
   const dataBaseExist = localStorage.getItem('dataBase');
   const dataBaseOn = dataBaseExist ? JSON.parse(dataBaseExist) : [];
@@ -35,6 +40,7 @@ function addOnDatabase(name, height, weight, imc) {
     imc: imc.value
   };
 
+  //faz a busca pelo nome
   const usrIndex = dataBaseOn.findIndex((usr) => usr.name === name.value);
 
   if (usrIndex !== -1) {
@@ -48,6 +54,7 @@ function addOnDatabase(name, height, weight, imc) {
   return dataBaseOn;
 }
 
+//calc imc
 function FuncImc() {
   if (weight.value > 0 && height.value > 0) {
     const result = weight.value / (height.value * height.value);
@@ -65,6 +72,7 @@ function FuncImc() {
   return false;
 }
 
+//calcula o imc e adiciona se for valido
 function calcularEAdicionar() {
   const imcValido = FuncImc();
 
@@ -73,17 +81,20 @@ function calcularEAdicionar() {
   }
 }
 
+// Navega para a tela de historico.
 function goToHistory() {
   router.push('/history');
 }
 
+//descrição dos valores do IMC
 const ImcDescription = computed(() => {
   if (!imc.value) return '';
   if (imc.value === 'Valor invalido') return '';
-  if (imc.value < 18.5) return 'Abaixo do peso.';
-  if (imc.value < 25) return 'Peso normal.';
-  if (imc.value < 30) return 'Sobrepeso.';
-  return 'Obesidade.';
+  if (imc.value < 18.5) return '⚠️ Abaixo do peso.';
+  if (imc.value < 25) return '✅ Peso normal.';
+  if (imc.value < 30) return '⚠️ Sobrepeso.';
+  if (imc.value > 30 && imc.value < 50) return '🚨 Obesidade.';
+  else "Dados Inválidos!"
 });
 
 const title = 'Calculadora IMC USR:';
@@ -93,22 +104,24 @@ const title = 'Calculadora IMC USR:';
   <div class="MainContainer">
     <div class="layout">
       <div class="tittle">
-        <h1>{{ title }} {{ name }}</h1>
+        <h2>{{ title }} {{ name }}</h2>
       </div>
 
       <div class="InputText">
         <label for="NameInput"></label>
-        <input type="text" id="NameInput" v-model="name" placeholder="Nome" maxlength="10">
+        <!-- maxlength limita a quantidade de caracteres do nome. -->
+        <input type="text" class="input" id="NameInput" v-model="name" placeholder="Nome" maxlength="10">
       </div>
 
       <div class="InputText">
         <label for="HeightInput"></label>
-        <input type="number" id="HeightInput" v-model.number="height" placeholder="Altura">
+        <!-- v-model.number converte o valor digitado para numero. -->
+        <input type="number" class="input" id="HeightInput" v-model.number="height" placeholder="Altura">
       </div>
 
       <div class="InputText">
         <label for="WeightInput"></label>
-        <input type="number" id="WeightInput" v-model.number="weight" placeholder="Peso">
+        <input type="number" class="input" id="WeightInput" v-model.number="weight" placeholder="Peso">
       </div>
 
       <div class="Result">
@@ -117,6 +130,7 @@ const title = 'Calculadora IMC USR:';
       </div>
 
       <div class="BtnPlace">
+        <!-- desabilita o campo se tiver algo vazio -->
         <button @click="calcularEAdicionar" :disabled="!name || !weight || !height">
           Calcular
         </button>
@@ -140,9 +154,15 @@ const title = 'Calculadora IMC USR:';
 }
 
 .layout{
-  background: #8EA8C3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #bedfff;
   border-radius: 1rem;
   padding: 1.5rem;
+  height: 50%;
+  width: 50%;
 }
 
 .tittle{
@@ -153,7 +173,9 @@ const title = 'Calculadora IMC USR:';
 }
 
 .Result{
-  color: white;
+  color: black;
+  padding: 1rem;
+  font-family: "Supermercado One", cursive;
 }
 
 .BtnPlace{
@@ -161,7 +183,12 @@ const title = 'Calculadora IMC USR:';
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
   gap: 1rem;
 }
+
+.input{
+  color: black;
+  background: white;  
+}
+
 </style>
