@@ -1,22 +1,16 @@
 <script setup>
-import {computed, ref, watchEffect} from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-// TODO: Formulário deve calcular o valor pressionando Enter e não apenas no clique do botão
-
-//navegar para outras telas usando router.push().
+// Permite navegar entre as telas usando as rotas do Vue Router.
 const router = useRouter();
 
-//cria ou verifica se existe
 createDataBase();
-
-//estados ligados aos vmodels
 const height = ref('');
 const weight = ref('');
 const name = ref('');
-const imc = ref(); // numero ou null (não for possível calcular) ou undefined (não calculado)
+const imc = ref();
 
-//array do banco no local storage
 function createDataBase() {
   const dataBaseExist = localStorage.getItem('dataBase');
 
@@ -30,7 +24,6 @@ function createDataBase() {
   }
 }
 
-//se ja tiver o usr ele só vai atualizar, caso contrario ele vai criar 1 novo
 function addOnDatabase(name, height, weight, imc) {
   const dataBaseExist = localStorage.getItem('dataBase');
   const dataBaseOn = dataBaseExist ? JSON.parse(dataBaseExist) : [];
@@ -42,7 +35,6 @@ function addOnDatabase(name, height, weight, imc) {
     imc: imc.value
   };
 
-  //faz a busca pelo nome
   const usrIndex = dataBaseOn.findIndex((usr) => usr.name === name.value);
 
   if (usrIndex !== -1) {
@@ -66,7 +58,6 @@ function calcularImc() {
   return null;
 }
 
-//calcula o imc e adiciona se for valido
 function calcularEAdicionar() {
   imc.value = calcularImc();
 
@@ -75,53 +66,53 @@ function calcularEAdicionar() {
   }
 }
 
-// Navega para a tela de historico.
 function goToHistory() {
-  router.push({name: "History"});
+  router.push({ name: "History" });
 }
 
+// Texto exibido no resultado: vazio, invalido ou IMC formatado.
 const imcResult = computed(() => {
   if (imc.value === null) return "Valor invalido";
   if (imc.value === undefined) return "";
-  
+
   return imc.value.toFixed(2);
 });
 
 const imcDescription = computed(() => {
   if (imc.value === null || imc.value === undefined) return "";
-  
-  if (imc.value < 18.5) return '⚠️ Abaixo do peso.';
-  if (imc.value < 25) return '✅ Peso normal.';
-  if (imc.value < 30) return '⚠️ Sobrepeso.';
-  if (imc.value < 50) return '🚨 Obesidade.';
-  
-  return "Dados Inválidos!";
+
+  if (imc.value < 18.5) return "Abaixo do peso.";
+  if (imc.value < 25) return "Peso normal.";
+  if (imc.value < 30) return "Sobrepeso.";
+  if (imc.value < 50) return "Obesidade.";
+
+  return "Dados Invalidos!";
 });
 
+// Desabilita o botao Calcular quando faltam dados ou a altura e invalida.
 const disableCalcular = computed(() => {
   if (height.value > 5) return true;
-  
   return !name.value || !weight.value || !height.value;
 });
-
 </script>
 
 <template>
+  <!-- Fonte usada no texto dos botoes animados. -->
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
   <div class="MainContainer">
     <div class="layout">
       <div class="tittle">
         <h2>Calculadora IMC USR: {{ name }}</h2>
       </div>
-
+      
       <div class="InputText">
         <label for="NameInput"></label>
-        <!-- maxlength limita a quantidade de caracteres do nome. -->
         <input type="text" class="input" id="NameInput" v-model="name" placeholder="Nome" maxlength="10">
       </div>
 
       <div class="InputText">
         <label for="HeightInput"></label>
-        <!-- v-model.number converte o valor digitado para numero. -->
         <input type="number" class="input" id="HeightInput" v-model.number="height" placeholder="Altura">
       </div>
 
@@ -129,19 +120,22 @@ const disableCalcular = computed(() => {
         <label for="WeightInput"></label>
         <input type="number" class="input" id="WeightInput" v-model.number="weight" placeholder="Peso">
       </div>
-
+      
       <div class="Result">
         <p class="ImcResult" v-if="imcResult">IMC: {{ imcResult }}</p>
         <p class="ImcDescription" v-if="imcDescription">Descricao: {{ imcDescription }}</p>
       </div>
 
+      <!-- Cada botao tem o texto por cima e uma class para a animação -->
       <div class="BtnPlace">
-        <!-- desabilita o campo se tiver algo vazio -->
-        <button @click="calcularEAdicionar" :disabled="disableCalcular">
-          Calcular
+        <button class="btn" @click="calcularEAdicionar" :disabled="disableCalcular">
+          <span>Calcular</span>
+          <div class="wave"></div>
         </button>
-        <button @click="goToHistory">
-          History
+
+        <button class="btn" @click="goToHistory">
+          <span>History</span>
+          <div class="wave"></div>
         </button>
       </div>
     </div>
@@ -192,9 +186,96 @@ const disableCalcular = computed(() => {
   gap: 1rem;
 }
 
-.input{
-  color: black;
-  background: white;  
+/* Area recortada para a wave */
+.btn{
+  position: relative;
+  display: block;
+  min-width: 145px;
+  padding: 18px 24px;
+  overflow: hidden;
+  border: 1px solid #5DF8D8;
+  border-radius: 10px;
+  background: #093C5D;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(9, 60, 93, 0.25);
 }
 
+/* Wave sobe */
+.btn:hover .wave,
+.btn:focus-visible .wave,
+.btn:active .wave{
+  top: -125px;
+}
+
+/* Manter o texto em cima da animação */
+.btn span{
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Camada que vai subir */
+.btn .wave{
+  position: absolute;
+  left: 50%;
+  top: -75px;
+  width: 220px;
+  height: 220px;
+  background: #5DF8D8;
+  box-shadow: inset 0 0 50px rgba(9, 60, 93, 0.45);
+  transform: translateX(-50%);
+  transition: top 0.45s ease;
+}
+
+/* Formas arredondadas que vão girar */
+.btn .wave::before,
+.btn .wave::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  transform: translate(-50%, -75%);
+}
+
+.btn .wave::before{
+  border-radius: 45%;
+  background: #06283d;
+  animation: wave 5s linear infinite;
+}
+
+.btn .wave::after{
+  border-radius: 40%;
+  background: rgba(6, 40, 61, 0.55);
+  animation: wave 9s linear infinite;
+}
+
+.btn:disabled{
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.btn:disabled .wave{
+  top: -75px;
+}
+
+/* Movimento circular */
+@keyframes wave{
+  0%{
+    transform: translate(-50%, -75%) rotate(0deg);
+  }
+
+  100%{
+    transform: translate(-50%, -75%) rotate(360deg);
+  }
+}
+
+.input{
+  color: black;
+  background: white;
+}
 </style>
