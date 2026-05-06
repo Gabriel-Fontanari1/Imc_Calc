@@ -74,15 +74,19 @@ function goToHistory() {
   router.push({ name: "History" });
 }
 
+// Target = oq o usuario acabou de digitar -> Replace (Regex/Expressão regular) -> D significa tudo que não for digito, e o g global (string toda), 0,3 -> no maximo 3 numeros.
 function formatHeightInput(event) {
   const digits = event.target.value.replace(/\D/g, '').slice(0, 3);
 
+  // Se após a limpeza, não sobrar nenhum numero, então ele entra no if.
+  // Limpa a tela e fecha a função.
   if (!digits) {
     height.value = '';
     event.target.value = height.value;
     return;
   }
-
+  
+  //Pega apenas o primeiro digito 0 -> insere uma virgula fixa -> pega o restante os numeros após a virgula
   height.value = `${digits[0]},${digits.slice(1)}`;
   event.target.value = height.value;
 }
@@ -107,7 +111,7 @@ const imcDescription = computed(() => {
 
   if (imc.value < 18.5) return "Abaixo do peso.";
   if (imc.value < 25) return "Peso normal.";
-  if (imc.value < 30) return "Sobrepeso.";
+  if (imc.value < 30) return "Sobrepeso.";  
   if (imc.value < 50) return "Obesidade.";
 
   return "Dados Invalidos!";
