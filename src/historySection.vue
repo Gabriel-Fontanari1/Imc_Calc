@@ -9,8 +9,10 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
 </script>
 
 <template>
-  <!-- Fonte usada no texto do botao animado. -->
-  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <!-- Fontes usadas na interface. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Supermercado+One&display=swap" rel="stylesheet">
 
   <div class="MainContainer">
     <div class="layout">
@@ -18,12 +20,32 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
         <h2>Histórico</h2>
       </div>
 
-      <div class="usr-list">
-        <ul>
-          <li v-for="usr in history" :key="usr.name">
-            {{ usr.name }} - Altura: {{ usr.height }} m - Peso: {{ usr.weight }} kg - IMC: {{ usr.imc }}
-          </li>
-        </ul>
+      <div class="table-scroll style-tabela">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Altura</th>
+              <th>Peso</th>
+              <th>IMC</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="(usr, index) in history" :key="usr.name">
+              <td>{{ index + 1 }}</td>
+              <td>{{ usr.name }}</td>
+              <td>{{ usr.height }} m</td>
+              <td>{{ usr.weight }} kg</td>
+              <td>{{ typeof usr.imc === 'number' ? usr.imc.toFixed(2) : usr.imc }}</td>
+            </tr>
+
+            <tr v-if="history.length === 0">
+              <td colspan="5" class="empty-table">Nenhum usuário salvo.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="BtnPlace">
@@ -42,7 +64,7 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Arimo", Arial, Helvetica, sans-serif;
   align-items: center;
   justify-content: center;
 }
@@ -57,21 +79,10 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
   padding: 1.5rem;
   height: 50%;
   width: 50%;
-}
-
-.usr-list{
-  color: black;
-  padding: 1rem;
-  font-family: "Supermercado One", cursive;
-  width: 100%;
-  max-height: 16rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.usr-list ul{
-  margin: 0;
-  padding: 0 1rem;
+  min-height: 30rem;
+  min-width: 28rem;
+  max-width: 50rem;
+  box-sizing: border-box;
 }
 
 .BtnPlace{
@@ -80,11 +91,7 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
   align-items: center;
   justify-content: center;
   gap: 1rem;
-}
-
-.usr-list li{
-  min-height: 2rem;
-  line-height: 2rem;
+  margin-top: 1rem;
 }
 
 .btn{
@@ -166,6 +173,79 @@ const history = ref(JSON.parse(localStorage.getItem('dataBase')) || []);
   padding: 1rem;
   margin-bottom: 1rem;
   color: black;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+}
+
+
+.table-scroll{
+  width: 100%;
+  max-height: 16rem;
+  overflow-y: auto;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #093C5D #bedfff;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 0.5rem;
+  box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
+}
+
+.table-scroll::-webkit-scrollbar-track{
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: #bedfff;
+}
+
+.table-scroll::-webkit-scrollbar{
+  width: 12px;
+  height: 12px;
+  background-color: #bedfff;
+}
+
+.table-scroll::-webkit-scrollbar-thumb{
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #093C5D;
+  border: 2px solid #bedfff;
+}
+
+.style-tabela table{
+  width: 100%;
+  border-collapse: collapse;
+  color: black;
+  font-size: 0.95rem;
+}
+
+.style-tabela th,
+.style-tabela td{
+  padding: 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(9, 60, 93, 0.18);
+}
+
+.style-tabela th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #406E8E;
+  color: white;
+  font-weight: 700;
+}
+
+.style-tabela tbody tr{
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.style-tabela tbody tr:nth-child(even){
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.style-tabela tbody tr:hover{
+  background: rgba(93, 248, 216, 0.25);
+}
+
+.empty-table{
+  color: #093C5D;
+  font-weight: 700;
 }
 
 </style>
