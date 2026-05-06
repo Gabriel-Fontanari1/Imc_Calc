@@ -24,5 +24,7 @@ Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://
 
 <img width="1171" height="906" alt="image" src="https://github.com/user-attachments/assets/48079c74-4fe1-4162-a8dd-1ce1c3c322e5" />
 
+
+
 <img width="1170" height="904" alt="image" src="https://github.com/user-attachments/assets/460b0ba5-f53f-4a10-8b19-09833cfccdef" />
 
