@@ -49,8 +49,10 @@ function addOnDatabase(name, height, weight, imc) {
 }
 
 function calcularImc() {
-  if (weight.value > 0 && height.value > 0) {
-    const result = weight.value / (height.value * height.value);
+  const heightNumber = getHeightNumber();
+
+  if (weight.value > 0 && heightNumber > 0) {
+    const result = weight.value / (heightNumber * heightNumber);
     if (result > 0 && result < 50) {
       return result;
     }
@@ -59,6 +61,8 @@ function calcularImc() {
 }
 
 function calcularEAdicionar() {
+  if (disableCalcular.value) return;
+
   imc.value = calcularImc();
 
   if (imc.value !== null) {
@@ -68,6 +72,26 @@ function calcularEAdicionar() {
 
 function goToHistory() {
   router.push({ name: "History" });
+}
+
+function formatHeightInput(event) {
+  const digits = event.target.value.replace(/\D/g, '').slice(0, 3);
+
+  if (!digits) {
+    height.value = '';
+    event.target.value = height.value;
+    return;
+  }
+
+  height.value = `${digits[0]},${digits.slice(1)}`;
+  event.target.value = height.value;
+}
+
+// Colocar virgula depois do primeiro caracter.
+function getHeightNumber() {
+  if (!/^\d,\d{1,2}$/.test(height.value)) return null;
+
+  return Number(height.value.replace(',', '.'));
 }
 
 // Texto exibido no resultado: vazio, invalido ou IMC formatado.
@@ -91,8 +115,9 @@ const imcDescription = computed(() => {
 
 // Desabilita o botao Calcular quando faltam dados ou a altura e invalida.
 const disableCalcular = computed(() => {
-  if (height.value > 5) return true;
-  return !name.value || !weight.value || !height.value;
+  const heightNumber = getHeightNumber();
+
+  return !name.value || !weight.value || !heightNumber || heightNumber > 5;
 });
 </script>
 
@@ -103,43 +128,55 @@ const disableCalcular = computed(() => {
   <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Supermercado+One&display=swap" rel="stylesheet">
 
   <div class="MainContainer">
-    <div class="layout">
-      <div class="tittle">
-        <h2>Calculadora IMC USR: {{ name }}</h2>
-      </div>
-      
-      <div class="InputText">
-        <label for="NameInput"></label>
-        <input type="text" class="input" id="NameInput" v-model="name" placeholder="Nome" maxlength="10">
-      </div>
+    <div class="background">
+      <!-- Tag usada para sobreposições estilização -->
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
 
-      <div class="InputText">
-        <label for="HeightInput"></label>
-        <input type="number" class="input" id="HeightInput" v-model.number="height" placeholder="Altura">
-      </div>
-
-      <div class="InputText">
-        <label for="WeightInput"></label>
-        <input type="number" class="input" id="WeightInput" v-model.number="weight" placeholder="Peso">
-      </div>
-      
-      <div class="Result">
-        <p class="ImcResult" v-if="imcResult">IMC: {{ imcResult }}</p>
-        <p class="ImcDescription" v-if="imcDescription">Descricao: {{ imcDescription }}</p>
-      </div>
-
-      <!-- Cada botao tem o texto por cima e uma class para a animação -->
-      <div class="BtnPlace">
-        <button class="btn" @click="calcularEAdicionar" :disabled="disableCalcular">
-          <span>Calcular</span>
-          <div class="wave"></div>
-        </button>
-
-        <button class="btn" @click="goToHistory">
-          <span>History</span>
-          <div class="wave"></div>
-        </button>
-      </div>
+      <form class="layout" @submit.prevent="calcularEAdicionar">
+        <div class="tittle">
+          <h2>Calculadora IMC USR: {{ name }}</h2>
+        </div>
+        
+        <div class="InputText">
+          <label for="NameInput"></label>
+          <input type="text" class="input" id="NameInput" v-model="name" placeholder="Nome" maxlength="10">
+        </div>
+  
+        <div class="InputText">
+          <label for="HeightInput"></label>
+          <input type="text" class="input" id="HeightInput" :value="height" inputmode="numeric" placeholder="Altura" maxlength="4" @input="formatHeightInput">
+        </div>
+  
+        <div class="InputText">
+          <label for="WeightInput"></label>
+          <input type="number" class="input" id="WeightInput" v-model.number="weight" placeholder="Peso">
+        </div>
+        
+        <div class="Result">
+          <p class="ImcResult" v-if="imcResult">IMC: {{ imcResult }}</p>
+          <p class="ImcDescription" v-if="imcDescription">Descricao: {{ imcDescription }}</p>
+        </div>
+  
+        <!-- Cada botao tem o texto por cima e uma class para a animação -->
+        <div class="BtnPlace">
+          <button class="btn" type="submit" :disabled="disableCalcular">
+            <span>Calcular</span>
+            <div class="wave"></div>
+          </button>
+  
+          <button class="btn" type="button" @click="goToHistory">
+            <span>History</span>
+            <div class="wave"></div>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -180,6 +217,8 @@ const disableCalcular = computed(() => {
   padding: 1rem;
   font-family: "Arimo", Arial, Helvetica, sans-serif;
 }
+
+/* Btn wave */
 
 .BtnPlace{
   display: flex;
@@ -283,4 +322,116 @@ const disableCalcular = computed(() => {
   border-radius: 0.3rem;
   box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
 }
+
+/* Background balls */
+
+@keyframes move {
+  100% {
+    transform: translate3d(0, 0, 1px) rotate(360deg);
+  }
+}
+
+.background {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: #4CB8B6;
+  overflow: hidden;
+}
+
+.layout{
+  position: relative;
+  z-index: 1;
+}
+
+.ball {
+  position: absolute;
+  z-index: 0;
+  width: 20vmin;
+  height: 20vmin;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  animation: move linear infinite;
+  pointer-events: none;
+}
+
+.ball:nth-child(odd) {
+  color: #006D5B;
+}
+
+.ball:nth-child(even) {
+  color: #FF6F61;
+}
+
+/* Using a custom attribute for variability */
+.ball:nth-child(1) {
+  top: 77%;
+  left: 88%;
+  animation-duration: 40s;
+  animation-delay: -3s;
+  transform-origin: 16vw -2vh;
+  box-shadow: 40vmin 0 5.703076368487546vmin currentColor;
+}
+.ball:nth-child(2) {
+  top: 42%;
+  left: 2%;
+  animation-duration: 53s;
+  animation-delay: -29s;
+  transform-origin: -19vw 21vh;
+  box-shadow: -40vmin 0 5.17594621519026vmin currentColor;
+}
+.ball:nth-child(3) {
+  top: 28%;
+  left: 18%;
+  animation-duration: 49s;
+  animation-delay: -8s;
+  transform-origin: -22vw 3vh;
+  box-shadow: 40vmin 0 5.248179047256236vmin currentColor;
+}
+.ball:nth-child(4) {
+  top: 50%;
+  left: 79%;
+  animation-duration: 26s;
+  animation-delay: -21s;
+  transform-origin: -17vw -6vh;
+  box-shadow: 40vmin 0 5.279749632220298vmin currentColor;
+}
+.ball:nth-child(5) {
+  top: 46%;
+  left: 15%;
+  animation-duration: 36s;
+  animation-delay: -40s;
+  transform-origin: 4vw 0vh;
+  box-shadow: -40vmin 0 5.964309466052033vmin currentColor;
+}
+.ball:nth-child(6) {
+  top: 77%;
+  left: 16%;
+  animation-duration: 31s;
+  animation-delay: -10s;
+  transform-origin: 18vw 4vh;
+  box-shadow: 40vmin 0 5.178483653434181vmin currentColor;
+}
+.ball:nth-child(7) {
+  top: 22%;
+  left: 17%;
+  animation-duration: 55s;
+  animation-delay: -6s;
+  transform-origin: 1vw -23vh;
+  box-shadow: -40vmin 0 5.703026794398318vmin currentColor;
+}
+.ball:nth-child(8) {
+  top: 41%;
+  left: 47%;
+  animation-duration: 43s;
+  animation-delay: -28s;
+  transform-origin: 25vw -3vh;
+  box-shadow: 40vmin 0 5.196265905749415vmin currentColor;
+}
+
 </style>
