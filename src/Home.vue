@@ -97,8 +97,10 @@ const disableCalcular = computed(() => {
 </script>
 
 <template>
-  <!-- Fonte usada no texto dos botoes animados. -->
-  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <!-- Fontes usadas na interface. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Supermercado+One&display=swap" rel="stylesheet">
 
   <div class="MainContainer">
     <div class="layout">
@@ -148,7 +150,7 @@ const disableCalcular = computed(() => {
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Arimo", Arial, Helvetica, sans-serif;
   align-items: center;
   justify-content: center;
 }
@@ -170,12 +172,13 @@ const disableCalcular = computed(() => {
   border-radius: 15px;
   padding: 1rem;
   margin-bottom: 1rem;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 }
 
 .Result{
   color: black;
   padding: 1rem;
-  font-family: "Supermercado One", cursive;
+  font-family: "Arimo", Arial, Helvetica, sans-serif;
 }
 
 .BtnPlace{
@@ -277,5 +280,7 @@ const disableCalcular = computed(() => {
 .input{
   color: black;
   background: white;
+  border-radius: 0.3rem;
+  box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
 }
 </style>
