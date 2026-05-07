@@ -126,14 +126,9 @@ const disableCalcular = computed(() => {
 </script>
 
 <template>
-  <!-- Fontes usadas na interface. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Supermercado+One&display=swap" rel="stylesheet">
-
   <div class="MainContainer">
     <div class="background">
-      <!-- Tag usada para sobreposições estilização -->
+      <!-- Tag usada para sobreposições estilização / servir de ganchos para aplicar estilização-->
       <span class="ball"></span>
       <span class="ball"></span>
       <span class="ball"></span>
@@ -143,18 +138,21 @@ const disableCalcular = computed(() => {
       <span class="ball"></span>
       <span class="ball"></span>
 
+      <!-- O @submite = v-on, ele vai ser um listenner, para quando o usr enviar o formulario / utilidade da tecla enter para enviar o formulario -->
+      
+      <!-- Prevent = Impede que a pagina recarregue quando o formulário é enviado -->
       <form class="layout" @submit.prevent="calcularEAdicionar">
         <div class="tittle">
           <h2>Calculadora IMC USR: {{ name }}</h2>
         </div>
         
         <div class="InputText">
-          <label for="NameInput"></label>
+          <label for="NameInput"></label> <!-- vmodel é automatico, apenas recebe o valor que o usuario digitou, mesmo com mascara, ele aceita qualquer coisa-->
           <input type="text" class="input" id="NameInput" v-model="name" placeholder="Nome" maxlength="10">
         </div>
   
         <div class="InputText">
-          <label for="HeightInput"></label>
+          <label for="HeightInput"></label> <!-- :value + @input forma manual, quando precisa aplicar uma mascara, no caso a virgula -->
           <input type="text" class="input" id="HeightInput" :value="height" inputmode="numeric" placeholder="Altura" maxlength="4" @input="formatHeightInput">
         </div>
   
@@ -168,7 +166,7 @@ const disableCalcular = computed(() => {
           <p class="ImcDescription" v-if="imcDescription">Descricao: {{ imcDescription }}</p>
         </div>
   
-        <!-- Cada botao tem o texto por cima e uma class para a animação -->
+        <!-- Cada botao tem o texto por cima e uma class para a animação -->  
         <div class="BtnPlace">
           <button class="btn" type="submit" :disabled="disableCalcular">
             <span>Calcular</span>
@@ -177,7 +175,7 @@ const disableCalcular = computed(() => {
   
           <button class="btn" type="button" @click="goToHistory">
             <span>History</span>
-            <div class="wave"></div>
+            <div class="wave"></div> 
           </button>
         </div>
       </form>
@@ -256,7 +254,7 @@ const disableCalcular = computed(() => {
 /* Manter o texto em cima da animação */
 .btn span{
   position: relative;
-  z-index: 1;
+  z-index: 1;   /* Indica qual camada da tela do navegador este item deve ficar */
   color: white;
   font-size: 0.85rem;
   letter-spacing: 2px;
@@ -273,7 +271,7 @@ const disableCalcular = computed(() => {
   background: #5DF8D8;
   box-shadow: inset 0 0 50px rgba(9, 60, 93, 0.45);
   transform: translateX(-50%);
-  transition: top 0.45s ease;
+  transition: top 0.45s ease; /* Indica que qualquer mudança no item, deve ser feita de forma gradual */
 }
 
 /* Formas arredondadas que vão girar */
@@ -410,7 +408,7 @@ const disableCalcular = computed(() => {
   left: 15%;
   animation-duration: 36s;
   animation-delay: -40s;
-  transform-origin: 4vw 0vh;
+  transform-origin: 4vw 0vh; /* Define um ponto de ancoragem na transofmração, ele india o eixo em volta do qual a bolinha vai girar */
   box-shadow: -40vmin 0 5.964309466052033vmin currentColor;
 }
 .ball:nth-child(6) {
